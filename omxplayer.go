@@ -8,13 +8,18 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/coreos/go-log/log"
 	"github.com/go-martini/martini"
 	omxplayer "github.com/longnguyen11288/go-omxplayer"
 )
 
+var dataDir string
+
 type File struct {
 	Filename string `json:"filename"`
 }
+
+type Files []string
 
 func PlayFileHandler(player *omxplayer.OmxPlayer,
 	w http.ResponseWriter, r *http.Request) {
@@ -41,8 +46,20 @@ func StopFileHandler(player *omxplayer.OmxPlayer, w http.ResponseWriter) {
 	fmt.Fprint(w, `{ "success": "true" }`)
 }
 
+func FilesHandler(w http.ResponseWriter) {
+	var files Files
+	osFiles, _ := ioutil.ReadDir(dataDir)
+	for _, f := range osFiles {
+		files = append(files, f.Name())
+	}
+	output, err := json.Marshal(files)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Fprint(w, output)
+}
+
 func main() {
-	var dataDir string
 	flag.StringVar(&dataDir, "data-dir", ".", "Data directory for videos")
 	flag.Parse()
 
@@ -53,6 +70,7 @@ func main() {
 	m.Get("/", func() string {
 		return "Hello world!"
 	})
+	m.Get("/files", FilesHandler)
 	m.Post("/playfile", PlayFileHandler)
 	m.Post("/stopfile", StopFileHandler)
 	m.Run()
