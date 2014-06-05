@@ -56,7 +56,7 @@ func FilesHandler(w http.ResponseWriter) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Fprint(w, output)
+	fmt.Fprint(w, string(output))
 }
 
 func main() {
