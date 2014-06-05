@@ -5,10 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 
-	"github.com/coreos/go-log/log"
 	"github.com/go-martini/martini"
 	omxplayer "github.com/longnguyen11288/go-omxplayer"
 )
