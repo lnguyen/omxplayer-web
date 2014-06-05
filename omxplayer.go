@@ -29,7 +29,7 @@ func PlayFileHandler(player *omxplayer.OmxPlayer,
 func main() {
 	player := omxplayer.New()
 	m := martini.Classic()
-	m.Map(player)
+	m.Map(&player)
 	m.Get("/", func() string {
 		return "Hello world!"
 	})
