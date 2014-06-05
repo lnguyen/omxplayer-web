@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/go-martini/martini"
 	omxplayer "github.com/longnguyen11288/go-omxplayer"
@@ -23,25 +25,28 @@ func PlayFileHandler(player *omxplayer.OmxPlayer,
 	}
 	err = json.Unmarshal(body, &file)
 	err = player.PlayFile(file.Filename)
-  if err != nil {
-    fmt.Fprint(w, `{ "error": "` + err.Error() + `" }`)
-    return
-  }
+	if err != nil {
+		fmt.Fprint(w, `{ "error": "`+err.Error()+`" }`)
+		return
+	}
 	fmt.Fprint(w, `{ "success": "true" }`)
 }
 
 func StopFileHandler(player *omxplayer.OmxPlayer, w http.ResponseWriter) {
-  err := player.StopFile()
-  if err != nil {
-    fmt.Fprint(w, `{ "error": "` + err.Error() + `" }`)
-    return
-  }
-  fmt.Fprint(w, `{ "success": "true" }`)
+	err := player.StopFile()
+	if err != nil {
+		fmt.Fprint(w, `{ "error": "`+err.Error()+`" }`)
+		return
+	}
+	fmt.Fprint(w, `{ "success": "true" }`)
 }
 
-
-
 func main() {
+	var dataDir string
+	flag.StringVar(&dataDir, "data-dir", ".", "Data directory for videos")
+	flag.Parse()
+
+	os.Chdir(dataDir)
 	player := omxplayer.New()
 	m := martini.Classic()
 	m.Map(&player)
@@ -49,6 +54,6 @@ func main() {
 		return "Hello world!"
 	})
 	m.Post("/playfile", PlayFileHandler)
-  m.Post("/stopfile", StopFileHandler)
+	m.Post("/stopfile", StopFileHandler)
 	m.Run()
 }
