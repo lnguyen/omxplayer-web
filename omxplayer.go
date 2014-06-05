@@ -22,9 +22,24 @@ func PlayFileHandler(player *omxplayer.OmxPlayer,
 		fmt.Println(err)
 	}
 	err = json.Unmarshal(body, &file)
-	player.PlayFile(file.Filename)
+	err := player.PlayFile(file.Filename)
+  if err != nil {
+    fmt.Fprint(w, `{ "error": "` + err.Error() + `" }`)
+    return
+  }
 	fmt.Fprint(w, `{ "success": "true" }`)
 }
+
+func StopFileHandler(player *omxplayer.OmxPlayer, w http.ResponseWriter) {
+  err := player.StopFile()
+  if err != nil {
+    fmt.Fprint(w, `{ "error": "` + err.Error() + `" }`)
+    return
+  }
+  fmt.Fprint(w, `{ "success": "true" }`)
+}
+
+
 
 func main() {
 	player := omxplayer.New()
@@ -34,5 +49,6 @@ func main() {
 		return "Hello world!"
 	})
 	m.Post("/playfile", PlayFileHandler)
+  m.Post("/stopfile", StopFileHandler)
 	m.Run()
 }
