@@ -22,7 +22,7 @@ func PlayFileHandler(player *omxplayer.OmxPlayer,
 		fmt.Println(err)
 	}
 	err = json.Unmarshal(body, &file)
-	err := player.PlayFile(file.Filename)
+	err = player.PlayFile(file.Filename)
   if err != nil {
     fmt.Fprint(w, `{ "error": "` + err.Error() + `" }`)
     return
