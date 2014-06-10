@@ -14,8 +14,14 @@ import (
 )
 
 var dataDir string
+var channel string
 
 type File struct {
+	Filename string `json:"filename"`
+}
+
+type Status struct {
+	Playing  bool   `json:"playing"`
 	Filename string `json:"filename"`
 }
 
@@ -59,8 +65,24 @@ func FilesHandler(w http.ResponseWriter) {
 	fmt.Fprint(w, string(output))
 }
 
+func ChannelHandler() string {
+	return fmt.Sprintf(`{ "channel": "%s" }`, channel)
+}
+
+func StatusHandler(player *omxplayer.OmxPlayer, w http.ResponseWriter) {
+	var status Status
+	status.Playing = player.IsPlaying()
+	status.Filename = player.FilePlaying()
+	output, err := json.Marshal(files)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Fprint(w, string(output))
+}
+
 func main() {
 	flag.StringVar(&dataDir, "data-dir", ".", "Data directory for videos")
+	flag.StringVar(&channel, "channel", "80", "Channel used for advertisement")
 	flag.Parse()
 
 	os.Chdir(dataDir)
@@ -70,7 +92,9 @@ func main() {
 	m.Get("/", func() string {
 		return "Hello world!"
 	})
+	m.Get("/channel", ChannelHandler)
 	m.Get("/files", FilesHandler)
+	m.Get("/status", StatusHandler)
 	m.Post("/playfile", PlayFileHandler)
 	m.Post("/stopfile", StopFileHandler)
 	m.Run()
