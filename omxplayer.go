@@ -73,7 +73,7 @@ func StatusHandler(player *omxplayer.OmxPlayer, w http.ResponseWriter) {
 	var status Status
 	status.Playing = player.IsPlaying()
 	status.Filename = player.FilePlaying()
-	output, err := json.Marshal(files)
+	output, err := json.Marshal(status)
 	if err != nil {
 		log.Fatal(err)
 	}
